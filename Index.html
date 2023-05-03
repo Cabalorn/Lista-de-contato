@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Lista de Contatos</title>
+    <script src="Script.js"></script>
+
+    <style>
+      /* Estilos para a tabela de contatos */
+      table {
+        border-collapse: collapse;
+        width: 100%;
+      }
+
+      th, td {
+        text-align: left;
+        padding: 8px;
+        border-bottom: 1px solid #ddd;
+      }
+
+      th {
+        background-color: #4CAF50;
+        color: white;
+      }
+
+      /* Estilos para os formulários */
+      form {
+        margin-bottom: 20px;
+      }
+
+      input[type=text], input[type=email], input[type=tel] {
+        width: 100%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        box-sizing: border-box;
+        border: none;
+        border-bottom: 1px solid #ddd;
+      }
+
+      input[type=submit], button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      input[type=submit]:hover, button:hover {
+        background-color: #45a049;
+      }
+
+      .delete-button {
+        background-color: #f44336;
+      }
+
+      .edit-button {
+        background-color: #4CAF50;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Lista de Contatos</h1>
+
+    <!-- Formulário para adicionar um novo contato -->
+    <form id="add-contact-form">
+     
+        <h2>Adicionar Contato</h2>
+        <label for="name">Nome:</label>
+        <input type="text" id="name" name="name" required>
+        <label for="email">E-mail:</label>
+        <input type="email" id="email" name="email" required>
+        <label for="phone">Telefone:</label>
+        <input type="tel" id="phone" name="phone" required>
+        <button type="submit">Adicionar</button>
+      </form>
+  
+      <!-- Tabela de contatos -->
+      <h2>Lista de Contatos</h2>
+      <table id="contact-table">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>E-mail</th>
+            <th>Telefone</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Aqui é onde vamos exibir os contatos -->
+        </tbody>
+      </table>
+  
+      <!-- Formulário para editar um contato -->
+      <form id="edit-contact-form" style="display: none;">
+        <h2>Editar Contato</h2>
+        <input type="hidden" id="edit-contact-id" name="id">
+        <label for="edit-name">Nome:</label>
+        <input type="text" id="edit-name" name="name" required>
+        <label for="edit-email">E-mail:</label>
+        <input type="email" id="edit-email" name="email" required>
+        <label for="edit-phone">Telefone:</label>
+        <input type="tel" id="edit-phone" name="phone" required>
+        <button type="submit">Salvar</button>
+        <button type="button" id="cancel-edit-button">Cancelar</button>
+      </form>
+  
+      <script>
+        const contactTable = document.querySelector('#contact-table tbody');
+        const addContactForm = document.querySelector('#add-contact-form');
+        const editContactForm = document.querySelector('#edit-contact-form');
+        const cancelEditButton = document.querySelector('#cancel-edit-button');
+  
+        function renderContact(contact, tr) {
+          tr.innerHTML = `
+            <td>${contact.name}</td>
+            <td>${contact.email}</td>
+            <td>${contact.phone}</td>
+            <td>
+              <button class="edit-button" data-id="${contact.id}">Editar</button>
+              <button class="delete-button" data-id="${contact.id}">Excluir</button>
+            </td>
+          `;
+          contactTable.insertBefore(tr, contactTable.firstChild);
+
+          // Adicionar evento de clique para o botão "Editar"
+          const editButton = tr.querySelector('.edit-button');
+          editButton.addEventListener('click', () => {
+            // Preencher o formulário de edição com os dados do contato
+            const id = editButton.getAttribute('data-id');
+            const contact = findContactById(id);
+            if (contact) {
+              editContactForm.querySelector('#edit-contact-id').value = contact.id;
+              editContactForm.querySelector('#edit-name').value = contact.name;
+              editContactForm.querySelector('#edit-email').value = contact.email;
+              editContactForm.querySelector('#edit-phone').value = contact.phone;
+              // Exibir o formulário de edição
+              editContactForm.style.display = 'block';
+            }
+          });
+
+          // Adicionar evento de clique para o botão "Excluir"
+          const deleteButton = tr.querySelector('.delete-button');
+          deleteButton.addEventListener('click', () => {
+            const id = deleteButton.getAttribute('data-id');
+            deleteContactById(id);
+            tr.remove();
+          });
+        }
+
+        function addContact(event) {
+          event.preventDefault();
+
+          const name = addContactForm.querySelector('#name').value;
+          const email = addContactForm.querySelector('#email').value;
+          const phone = addContactForm.querySelector('#phone').value;
+
+          const contact = {
+            id: generateId(),
+            name,
+            email,
+            phone
+          };
+
+          const tr = document.createElement('tr');
+          renderContact(contact, tr);
+
+          addContactForm.reset();
+        }
+
+        addContactForm.addEventListener('submit', addContact);
+
+        cancelEditButton.addEventListener('click', () => {
+          editContactForm.style.display = 'none';
+        });
+      </script>
+    </body>
+</html>
